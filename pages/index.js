@@ -3,7 +3,7 @@ import Head from "next/head";
 import { format, parse } from "date-fns";
 const PAGE = "Home";
 
-const Home = ({ sermons }) => {
+const Home = ({ sermons, meta }) => {
   return (
     <div className="w-full max-w-xl mx-auto">
       <Head>
@@ -11,7 +11,9 @@ const Home = ({ sermons }) => {
       </Head>
       <div className="container flex flex-wrap items-center w-full py-4 mx-auto border-b">
         <h1 className="w-full mb-4 text-3xl text-center">Welcome to HZHG!</h1>
-        <h2 className="w-full mb-4 text-center">Meeting Time: 20:30</h2>
+        <h2 className="w-full mb-4 text-center">
+          Meeting Time: {meta[0].meetingTime}
+        </h2>
         <a
           className="px-4 py-2 mx-auto text-xl text-white bg-gray-900 rounded-lg"
           href="https://hegau.church/hzhg"
@@ -87,6 +89,9 @@ export async function getStaticProps(context) {
     },
     body: JSON.stringify({
       query: `{
+          meta: metas(first: 1) {
+            meetingTime
+          }
           sermons(orderBy:date_DESC) {
             title
             message {
@@ -115,11 +120,11 @@ export async function getStaticProps(context) {
   }
 
   const {
-    data: { sermons },
+    data: { sermons, meta },
   } = await response.json();
 
   return {
-    props: { sermons, errors }, // will be passed to the page component as props
+    props: { sermons, meta, errors }, // will be passed to the page component as props
   };
 }
 
